@@ -108,7 +108,7 @@ app.MapGet("/api/animals/appointments", () =>
     }
 });
 
-//Get /api/animals/{id:int}/appointments
+//GET /api/animals/{id:int}/appointments
 app.MapGet("/api/animals/{id:int}/appointments", (int id) =>
 {
     var animal = DB.Animals.FirstOrDefault(a => a.Id == id);
@@ -118,9 +118,37 @@ app.MapGet("/api/animals/{id:int}/appointments", (int id) =>
     }
 
     var appointmentsList = AppointmentDB.Appointments.Where(a => a.Animal.Id == id);
+
+    if (appointmentsList == null)
+    {
+        return Results.NotFound($"Appointments for animal with id {id} not found");
+    }
+    
     return Results.Ok(appointmentsList);
 });
 
+//POST /api/animals/{id:int}/appointments
+app.MapPost("/api/animals/{id:int}/appointments", (int id, [FromBody] Appointment appointment) =>
+{
+    var animal = DB.Animals.FirstOrDefault(a => a.Id == id);
+    if (animal == null)
+    {
+        return Results.NotFound($"Animal with id {id} not found");
+    }
+
+    if (AppointmentDB.Appointments.Any(a => a.Id == appointment.Id))
+    {
+        return Results.Conflict($"Appointment with id {appointment.Id} already exists");
+    }
+
+    if (id != appointment.Animal.Id)
+    {
+        return Results.Conflict($"Animal id in url {id} not equal to animal id {appointment.Animal.Id} in appointment");
+    }
+    
+    AppointmentDB.Appointments.Add(appointment);
+    return Results.Created($"/api/animals/{id}/appointments", appointment);
+});
 
 app.UseHttpsRedirection();
 
