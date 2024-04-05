@@ -95,7 +95,31 @@ app.MapDelete("/api/animals/{id:int}", (int id) =>
     return Results.Ok();
 });
 
+//GET /api/animals/appointments
+app.MapGet("/api/animals/appointments", () =>
+{
+    if (AppointmentDB.Appointments.Any())
+    {
+        return Results.Ok(AppointmentDB.Appointments);
+    }
+    else
+    {
+        return Results.NotFound("Appointments not found");
+    }
+});
 
+//Get /api/animals/{id:int}/appointments
+app.MapGet("/api/animals/{id:int}/appointments", (int id) =>
+{
+    var animal = DB.Animals.FirstOrDefault(a => a.Id == id);
+    if (animal == null)
+    {
+        return Results.NotFound($"Animal with id {id} not found");
+    }
+
+    var appointmentsList = AppointmentDB.Appointments.Where(a => a.Animal.Id == id);
+    return Results.Ok(appointmentsList);
+});
 
 
 app.UseHttpsRedirection();
