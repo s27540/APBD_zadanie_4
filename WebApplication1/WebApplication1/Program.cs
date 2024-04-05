@@ -81,8 +81,19 @@ app.MapPut("/api/animals/{id:int}", (int id, [FromBody] Animal animalInserted) =
     return Results.Ok(animal);
 });
 
-
-
+//Delete /api/animals/{id:int}
+app.MapDelete("/api/animals/{id:int}", (int id) =>
+{
+    var animal = DB.animals.FirstOrDefault(a => a.Id == id);
+    if (animal == null)
+    {
+        return Results.NotFound($"Animal with id {id} not found");
+    }
+    
+    var animals = DB.animals.Where(a => a.Id != id);
+    DB.animals = animals.ToList();
+    return Results.Ok();
+});
 
 
 
