@@ -19,7 +19,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-//Get animal List
+//GET /api/animals
 app.MapGet("/api/animals", () =>
 {
     if (DB.animals.Any())
@@ -32,7 +32,7 @@ app.MapGet("/api/animals", () =>
     }
 });
 
-//Get animal by id
+//GET /api/animals/{id:int}
 app.MapGet("/api/animals/{id:int}", (int id) =>
 {
     var animal = DB.animals.Find(a => a.Id == id);
@@ -43,21 +43,44 @@ app.MapGet("/api/animals/{id:int}", (int id) =>
     }
     else
     {
-        return Results.NotFound("Animal with that Id not found");
+        return Results.NotFound($"Animal with id {id} not found");
     }
 });
 
-//Adding animal
+//POST /api/animals
 app.MapPost("/api/animals", ([FromBody] Animal animal) =>
 {
     if (DB.animals.Any(a => a.Id == animal.Id))
     {
-        return Results.Conflict("Animal with that Id already exists");
+        return Results.Conflict($"Animal with id {animal.Id} already exists");
     }
     
     DB.animals.Add(animal);
     return Results.Created($"/api/animals/{animal.Id}", animal);
 });
+
+// PUT /api/animals/{id:int}
+app.MapPut("/api/animals/{id:int}", (int id, [FromBody] Animal animalInserted) =>
+{
+    var animal = DB.animals.FirstOrDefault(a => a.Id == id);
+    if (animal is null) return Results.NotFound($"Animal with id {id} not found");
+
+    
+    if (!animalInserted.Name.Equals("string") && animal.Name != animalInserted.Name)
+        animal.Name = animalInserted.Name;
+
+    if (!animalInserted.Category.Equals("string") && animal.Category != animalInserted.Category)
+        animal.Category = animalInserted.Category;
+
+    if (animalInserted.Mass != 0 && animal.Mass != animalInserted.Mass)
+        animal.Mass = animalInserted.Mass;
+
+    if (!animalInserted.CoatColor.Equals("string") && animal.CoatColor != animalInserted.CoatColor)
+        animal.CoatColor = animalInserted.CoatColor;
+
+    return Results.Ok(animal);
+});
+
 
 
 
