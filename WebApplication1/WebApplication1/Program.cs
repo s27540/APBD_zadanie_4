@@ -22,9 +22,9 @@ if (app.Environment.IsDevelopment())
 //GET /api/animals
 app.MapGet("/api/animals", () =>
 {
-    if (DB.animals.Any())
+    if (DB.Animals.Any())
     {
-        return Results.Ok(DB.animals);
+        return Results.Ok(DB.Animals);
     }
     else
     {
@@ -35,7 +35,7 @@ app.MapGet("/api/animals", () =>
 //GET /api/animals/{id:int}
 app.MapGet("/api/animals/{id:int}", (int id) =>
 {
-    var animal = DB.animals.Find(a => a.Id == id);
+    var animal = DB.Animals.Find(a => a.Id == id);
 
     if (animal != null)
     {
@@ -50,19 +50,19 @@ app.MapGet("/api/animals/{id:int}", (int id) =>
 //POST /api/animals
 app.MapPost("/api/animals", ([FromBody] Animal animal) =>
 {
-    if (DB.animals.Any(a => a.Id == animal.Id))
+    if (DB.Animals.Any(a => a.Id == animal.Id))
     {
         return Results.Conflict($"Animal with id {animal.Id} already exists");
     }
     
-    DB.animals.Add(animal);
+    DB.Animals.Add(animal);
     return Results.Created($"/api/animals/{animal.Id}", animal);
 });
 
 // PUT /api/animals/{id:int}
 app.MapPut("/api/animals/{id:int}", (int id, [FromBody] Animal animalInserted) =>
 {
-    var animal = DB.animals.FirstOrDefault(a => a.Id == id);
+    var animal = DB.Animals.FirstOrDefault(a => a.Id == id);
     if (animal is null) return Results.NotFound($"Animal with id {id} not found");
 
     
@@ -84,16 +84,17 @@ app.MapPut("/api/animals/{id:int}", (int id, [FromBody] Animal animalInserted) =
 //Delete /api/animals/{id:int}
 app.MapDelete("/api/animals/{id:int}", (int id) =>
 {
-    var animal = DB.animals.FirstOrDefault(a => a.Id == id);
+    var animal = DB.Animals.FirstOrDefault(a => a.Id == id);
     if (animal == null)
     {
         return Results.NotFound($"Animal with id {id} not found");
     }
     
-    var animals = DB.animals.Where(a => a.Id != id);
-    DB.animals = animals.ToList();
+    var animals = DB.Animals.Where(a => a.Id != id);
+    DB.Animals = animals.ToList();
     return Results.Ok();
 });
+
 
 
 

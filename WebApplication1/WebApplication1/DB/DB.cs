@@ -4,7 +4,7 @@ namespace WebApplication1.DB;
 
 public class DB
 {
-    public static List<Animal> animals = new()
+    public static List<Animal> Animals = new()
     {
         new Animal { Id = 1, Name = "Lili", Category = "Dog", CoatColor = "White", Mass = 23.5},
         new Animal { Id = 2, Name = "Johnathan", Category = "Dog", CoatColor = "Black", Mass = 43.6},
