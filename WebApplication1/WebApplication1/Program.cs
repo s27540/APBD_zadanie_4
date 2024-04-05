@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DB;
+using WebApplication1.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,35 @@ app.MapGet("/api/animals", () =>
         return Results.NotFound("Animals not found");
     }
 });
+
+//Get animal by id
+app.MapGet("/api/animals/{id:int}", (int id) =>
+{
+    var animal = DB.animals.Find(a => a.Id == id);
+
+    if (animal != null)
+    {
+        return Results.Ok(animal);
+    }
+    else
+    {
+        return Results.NotFound("Animal with that Id not found");
+    }
+});
+
+//Adding animal
+app.MapPost("/api/animals", ([FromBody] Animal animal) =>
+{
+    if (DB.animals.Any(a => a.Id == animal.Id))
+    {
+        return Results.Conflict("Animal with that Id already exists");
+    }
+    
+    DB.animals.Add(animal);
+    return Results.Created($"/api/animals/{animal.Id}", animal);
+});
+
+
 
 
 
